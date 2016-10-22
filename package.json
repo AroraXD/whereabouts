@@ -9,7 +9,7 @@
         "displayName": "whereabouts",
         "enableMultiJS": true,
         "messageKeys": [
-            "dummy"
+            "YourKey"
         ],
         "projectType": "native",
         "resources": {

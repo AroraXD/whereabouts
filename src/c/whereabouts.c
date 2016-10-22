@@ -9,6 +9,38 @@ static TextLayer *s_date_layer;
 static BitmapLayer * s_background_layer;
 static GBitmap * s_background_bitmap;
 
+
+//SEND
+static bool send_to_phone_multi() {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "send to phone");
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+
+  // Some other request with no string data
+  const int dummy_val = 1;
+  dict_write_int(iter, MESSAGE_KEY_YourKey, &dummy_val, sizeof(int), true);
+
+
+  dict_write_end(iter);
+  app_message_outbox_send();
+  return true;
+}
+
+// RECEIVE
+// Handle the response from AppMessage
+static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "got data");
+
+  // Background Color
+  Tuple *yourkey_t = dict_find(iter, MESSAGE_KEY_YourKey);
+  if (yourkey_t) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "got: %d", (int)yourkey_t->value->int32);
+  }
+
+
+}
+
+
 static void main_window_load(Window * window)
 {
 
@@ -56,6 +88,8 @@ static void update_time()
 static void tick_handler (struct tm * tick_time, TimeUnits units_changed)
 {
     update_time();
+  
+  // IF tick_time->tm_min % 30 send_to_phone_multi
     
 }
 
@@ -80,6 +114,11 @@ static void init()
  
  window_set_background_color(s_main_window, GColorBlack);
  window_stack_push(s_main_window, true);
+  
+  // Listen for AppMessages
+  app_message_register_inbox_received(prv_inbox_received_handler);
+  app_message_open(128, 128);
+
 
  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
  update_time();
