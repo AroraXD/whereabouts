@@ -73,9 +73,9 @@ static void main_window_load(Window * window)
   text_layer_set_background_color(s_family_three_layer, GColorClear);
   text_layer_set_background_color(s_family_four_layer, GColorClear);
 
-  text_layer_set_text(s_family_one_layer,"🙂");
-  text_layer_set_text(s_family_two_layer,"❤️");
-  text_layer_set_text(s_family_three_layer,"🙃");
+  text_layer_set_text(s_family_one_layer,"😂");
+  text_layer_set_text(s_family_two_layer,"😍");
+  text_layer_set_text(s_family_three_layer,"😇");
   text_layer_set_text(s_family_four_layer," ");
 
   s_background_layer = bitmap_layer_create(bounds);
@@ -114,23 +114,52 @@ static void update_time() {
 static void check_overlap() {
   GRect one = layer_get_frame(text_layer_get_layer(s_family_one_layer));
   GRect two = layer_get_frame(text_layer_get_layer(s_family_two_layer));
-  if (grect_equal(&one, &two)) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap true %d", 1);
-    layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (one.origin.x - 7, one.origin.y, bounds.size.w, 50));
-    layer_set_frame(text_layer_get_layer(s_family_two_layer), GRect (one.origin.x + 7, one.origin.y, bounds.size.w, 50));
+  GRect three = layer_get_frame(text_layer_get_layer(s_family_three_layer));
+
+  if (grect_equal(&one, &two) && grect_equal(&two, &three)) {
+    layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (one.origin.x - 15, one.origin.y, bounds.size.w, 50));
+    layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (one.origin.x + 15, one.origin.y, bounds.size.w, 50));    
+    
   } else {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap false %d", 1);    
+    if (grect_equal(&one, &two)) {
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap true %d", 1);
+      layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (one.origin.x - 7, one.origin.y, bounds.size.w, 50));
+      layer_set_frame(text_layer_get_layer(s_family_two_layer), GRect (two.origin.x + 7, two.origin.y, bounds.size.w, 50));
+    } else {
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap false %d", 1);    
+    }
+  
+      if (grect_equal(&two, &three)) {
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap true %d", 1);
+        layer_set_frame(text_layer_get_layer(s_family_two_layer), GRect (two.origin.x - 7, two.origin.y, bounds.size.w, 50));
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (three.origin.x + 7, three.origin.y, bounds.size.w, 50));
+      } else {
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap false %d", 1);    
+      }
+    
+    if (grect_equal(&one, &three)) {
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap true %d", 1);
+        layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (one.origin.x - 7, one.origin.y, bounds.size.w, 50));
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (three.origin.x + 7, three.origin.y, bounds.size.w, 50));
+      } else {
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap false %d", 1);    
+      }
+
   }
+  
+    layer_mark_dirty(text_layer_get_layer(s_family_one_layer));
+    layer_mark_dirty(text_layer_get_layer(s_family_two_layer));
+    layer_mark_dirty(text_layer_get_layer(s_family_three_layer));
 }
 
 static void update_family_member(int family_member, int position) {
     if (family_member == 1) {
       if (position == 0) {
-        text_layer_set_text(s_family_one_layer,"🙂");
+        text_layer_set_text(s_family_one_layer,"😂");
         layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (68, 35, bounds.size.w, 50));
       } 
       if (position == 1) {
-        text_layer_set_text(s_family_one_layer,"🙂");
+        text_layer_set_text(s_family_one_layer,"😂");
         layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (110, PBL_IF_ROUND_ELSE(64,128)/2-15, bounds.size.w, 50));
       } 
       if (position == 2) {
@@ -138,15 +167,15 @@ static void update_family_member(int family_member, int position) {
         layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (110, PBL_IF_ROUND_ELSE(64,128)/2+10, bounds.size.w, 50));
       } 
       if (position == 3) {
-        text_layer_set_text(s_family_one_layer,"🙂");
+        text_layer_set_text(s_family_one_layer,"😂");
         layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (68, PBL_IF_ROUND_ELSE(64,128)-30, bounds.size.w, 50));
       } 
       if (position == 4) {
-        text_layer_set_text(s_family_one_layer,"🙂");
+        text_layer_set_text(s_family_one_layer,"😂");
         layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (27, PBL_IF_ROUND_ELSE(64,128)/2+10, bounds.size.w, 50));
       } 
       if (position == 5) {
-        text_layer_set_text(s_family_one_layer,"🙂");
+        text_layer_set_text(s_family_one_layer,"😂");
         layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (27, PBL_IF_ROUND_ELSE(64,128)/2-15, bounds.size.w, 50));
       } 
     }
@@ -170,9 +199,32 @@ static void update_family_member(int family_member, int position) {
         layer_set_frame(text_layer_get_layer(s_family_two_layer), GRect (27, PBL_IF_ROUND_ELSE(64,128)/2-15, bounds.size.w, 50));
       } 
     }
-    check_overlap();
+    if (family_member == 3) {
+      if (position == 0) {
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (68, 35, bounds.size.w, 50));
+      } 
+      if (position == 1) {
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (110, PBL_IF_ROUND_ELSE(64,128)/2-15, bounds.size.w, 50));
+      } 
+      if (position == 2) {
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (110, PBL_IF_ROUND_ELSE(64,128)/2+10, bounds.size.w, 50));
+      } 
+      if (position == 3) {
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (68, PBL_IF_ROUND_ELSE(64,128)-30, bounds.size.w, 50));
+      } 
+      if (position == 4) {
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (27, PBL_IF_ROUND_ELSE(64,128)/2+10, bounds.size.w, 50));
+      } 
+      if (position == 5) {
+        layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (27, PBL_IF_ROUND_ELSE(64,128)/2-15, bounds.size.w, 50));
+      } 
+    }
+}
+
+static void redraw_all() {
     layer_mark_dirty(text_layer_get_layer(s_family_one_layer));
     layer_mark_dirty(text_layer_get_layer(s_family_two_layer));
+    layer_mark_dirty(text_layer_get_layer(s_family_three_layer));
 }
 
 
@@ -184,7 +236,10 @@ static void tick_handler (struct tm * tick_time, TimeUnits units_changed) {
 
 static void tick_handler_seconds (struct tm * tick_time, TimeUnits units_changed) {
     update_family_member(1, tick_time->tm_sec%6);   
-    update_family_member(2, (tick_time->tm_sec*2+1)%6);    
+    update_family_member(2, (2*tick_time->tm_sec)%6);    
+    update_family_member(3, (3*tick_time->tm_sec)%6); 
+    check_overlap();
+    redraw_all();
   // IF tick_time->tm_min % 30 send_to_phone_multi
     update_time();
 }
