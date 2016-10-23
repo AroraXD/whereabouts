@@ -11,7 +11,7 @@ function fetch() {
         var response = JSON.parse(req.responseText);
         response.forEach(function(item) {
           if (item['message']) {
-            Pebble.sendAppMessage({ 'location': item['message'], 'from', item['from'] });
+            Pebble.sendAppMessage({ 'location': item['message'], 'from': item['from'] });
           }
         })
       } else {
@@ -21,6 +21,10 @@ function fetch() {
   };
   req.send(null);
 }
+
+Pebble.addEventListener('refresh-data', function(e) {
+  fetch();
+});
 
 // Set callback for the app ready event
 Pebble.addEventListener('ready', function(e) {
