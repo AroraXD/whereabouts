@@ -33,20 +33,6 @@ static bool send_to_phone_multi() {
   return true;
 }
 
-// RECEIVE
-// Handle the response from AppMessage
-static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "got data");
-
-  // Background Color
-  Tuple *yourkey_t = dict_find(iter, MESSAGE_KEY_YourKey);
-  if (yourkey_t) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "got: %d", (int)yourkey_t->value->int32);
-  }
-
-
-}
-
 
 static void main_window_load(Window * window)
 {
@@ -122,7 +108,6 @@ static void check_overlap() {
     
   } else {
     if (grect_equal(&one, &two)) {
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap true %d", 1);
       layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (one.origin.x - 7, one.origin.y, bounds.size.w, 50));
       layer_set_frame(text_layer_get_layer(s_family_two_layer), GRect (two.origin.x + 7, two.origin.y, bounds.size.w, 50));
     } else {
@@ -130,7 +115,6 @@ static void check_overlap() {
     }
   
       if (grect_equal(&two, &three)) {
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap true %d", 1);
         layer_set_frame(text_layer_get_layer(s_family_two_layer), GRect (two.origin.x - 7, two.origin.y, bounds.size.w, 50));
         layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (three.origin.x + 7, three.origin.y, bounds.size.w, 50));
       } else {
@@ -138,7 +122,6 @@ static void check_overlap() {
       }
     
     if (grect_equal(&one, &three)) {
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "Overlap true %d", 1);
         layer_set_frame(text_layer_get_layer(s_family_one_layer), GRect (one.origin.x - 7, one.origin.y, bounds.size.w, 50));
         layer_set_frame(text_layer_get_layer(s_family_three_layer), GRect (three.origin.x + 7, three.origin.y, bounds.size.w, 50));
       } else {
@@ -221,6 +204,57 @@ static void update_family_member(int family_member, int position) {
     }
 }
 
+// RECEIVE
+// Handle the response from AppMessage
+static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "got data");
+  
+  // Background Color
+  Tuple *yourkey_t = dict_find(iter, MESSAGE_KEY_YourKey);
+  if (yourkey_t) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "got: %d", (int)yourkey_t->value->int32);
+  }
+
+  Tuple *fromkey = dict_find(iter, MESSAGE_KEY_from);
+  if (fromkey ) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "got: %s", fromkey->value->cstring);
+  }
+
+  Tuple *locationkey = dict_find(iter, MESSAGE_KEY_location);
+  if (locationkey) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "got: %s", locationkey->value->cstring);
+  }
+
+  if (!strcmp(locationkey->value->cstring, "home")) {
+    update_family_member(3, 0);
+  } else {
+  if (!strcmp(locationkey->value->cstring, "school")) {
+    update_family_member(3, 1);
+  } else {
+  if (!strcmp(locationkey->value->cstring, "work")) {
+    update_family_member(3, 2);
+  } else {
+  if (!strcmp(locationkey->value->cstring, "code")) {
+    update_family_member(3, 4);
+  } else {
+  if (!strcmp(locationkey->value->cstring, "food")) {
+    update_family_member(3, 5);
+  } else {
+    update_family_member(3, 3);
+    
+  }
+    
+  }
+    
+  }
+    
+  }
+    
+  }  
+
+}
+
+
 static void redraw_all() {
     layer_mark_dirty(text_layer_get_layer(s_family_one_layer));
     layer_mark_dirty(text_layer_get_layer(s_family_two_layer));
@@ -235,13 +269,50 @@ static void tick_handler (struct tm * tick_time, TimeUnits units_changed) {
 }
 
 static void tick_handler_seconds (struct tm * tick_time, TimeUnits units_changed) {
-    update_family_member(1, tick_time->tm_sec%6);   
-    update_family_member(2, (2*tick_time->tm_sec)%6);    
-    update_family_member(3, (3*tick_time->tm_sec)%6); 
+    update_family_member(1, (tick_time->tm_sec/4)%6);   
+    update_family_member(2, (tick_time->tm_sec/2)%6);    
+//     update_family_member(3, (3*tick_time->tm_sec)%6); 
     check_overlap();
     redraw_all();
   // IF tick_time->tm_min % 30 send_to_phone_multi
     update_time();
+
+  
+  
+  
+  static const uint32_t SOME_DATA_KEY = 0xb00bf00b;
+  static const uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  
+  // CString + key:
+  static const uint32_t SOME_STRING_KEY = 0xabbababe;
+  static const char *string = "Hello World";
+  
+  // Calculate the buffer size that is needed for the final Dictionary:
+  const uint8_t key_count = 2;
+  const uint32_t size = dict_calc_buffer_size(key_count, sizeof(data),
+                                              strlen(string) + 1);
+  
+  // Stack-allocated buffer in which to create the Dictionary:
+  uint8_t buffer[size];
+  
+    // Iterator variable, keeps the state of the creation serialization process:
+    DictionaryIterator iter;
+  
+    // Begin:
+    dict_write_begin(&iter, buffer, sizeof(buffer));
+    // Write the Data:
+    dict_write_data(&iter, SOME_DATA_KEY, data, sizeof(data));
+    // Write the CString:
+    dict_write_cstring(&iter, SOME_STRING_KEY, string);
+    // End:
+    const uint32_t final_size = dict_write_end(&iter);
+    
+    DictionaryIterator *itter = &iter;
+  
+  
+  
+    app_message_outbox_begin(&itter);
+    app_message_outbox_send();
 }
 
 

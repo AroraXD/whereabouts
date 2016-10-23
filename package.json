@@ -9,7 +9,9 @@
         "displayName": "whereabouts",
         "enableMultiJS": true,
         "messageKeys": [
-            "YourKey"
+            "YourKey",
+            "location",
+            "from"
         ],
         "projectType": "native",
         "resources": {
@@ -17,6 +19,7 @@
                 {
                     "file": "images/watch.png",
                     "name": "BACKGROUND",
+                    "targetPlatforms": null,
                     "type": "bitmap"
                 }
             ]

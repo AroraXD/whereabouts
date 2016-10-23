@@ -1,7 +1,7 @@
 function fetch() {
   var req = new XMLHttpRequest();
   // build the GET request
-  req.open('GET', "http://545f9eab.ngrok.io/messages?for=4916092192757", true);
+  req.open('GET', "http://545f9eab.ngrok.io/messages?for=4916092192757&cache_buster" + Math.random(), true);
   req.onload = function(e) {
     if (req.readyState == 4) {
       // 200 - HTTP OK
@@ -22,7 +22,7 @@ function fetch() {
   req.send(null);
 }
 
-Pebble.addEventListener('refresh-data', function(e) {
+Pebble.addEventListener('appmessage', function(e) {
   fetch();
 });
 
@@ -33,12 +33,12 @@ Pebble.addEventListener('ready', function(e) {
   fetch();
   
 
-  Pebble.sendAppMessage({
-    'YourKey': true
-  }, function(e) {
-    console.log('sent');
-  }, function() {
-    console.log('failed');
-  });
+//   Pebble.sendAppMessage({
+//     'YourKey': true
+//   }, function(e) {
+//     console.log('sent');
+//   }, function() {
+//     console.log('failed');
+//   });
 });
 
